@@ -18,6 +18,9 @@
 
 pragma solidity ^0.8.0;
 
+import "forge-std/console.sol";
+
+
 contract PlonkVerifier {
     uint256 private constant R_MOD =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
@@ -209,6 +212,7 @@ contract PlonkVerifier {
         view
         returns (bool success)
     {
+        uint logValue = 0;
         assembly {
             let mem := mload(0x40)
             let freeMem := add(mem, STATE_LAST_MEM)
@@ -235,7 +239,9 @@ contract PlonkVerifier {
 
             // public inputs contribution
             let l_pi := sum_pi_wo_api_commit(public_inputs.offset, public_inputs.length, freeMem)
+            // logValue := l_pi
             let l_pi_commit := sum_pi_commit(proof.offset, public_inputs.length, freeMem)
+            logValue := l_pi_commit
             l_pi := addmod(l_pi_commit, l_pi, R_MOD)
             mstore(add(mem, STATE_PI), l_pi)
 
@@ -650,9 +656,9 @@ contract PlonkVerifier {
             /// @param mPtr free memory
             /// @return res = ωⁱ/n * (ζⁿ-1)/(ζ-ωⁱ)
             function compute_ith_lagrange_at_z(z, zpnmo, i, mPtr) -> res {
-                let w := pow(VK_OMEGA, i, mPtr) // w**i
+                let w := pow(VK_OMEGA, i, mPtr) // w**i //omega^i
                 i := addmod(z, sub(R_MOD, w), R_MOD) // z-w**i
-                w := mulmod(w, VK_INV_DOMAIN_SIZE, R_MOD) // w**i/n
+                w := mulmod(w, VK_INV_DOMAIN_SIZE, R_MOD) // w**i/n //omega^i/n
                 i := pow(i, sub(R_MOD, 2), mPtr) // (z-w**i)**-1
                 w := mulmod(w, i, R_MOD) // w**i/n*(z-w)**-1
                 res := mulmod(w, zpnmo, R_MOD)
@@ -1375,5 +1381,6 @@ contract PlonkVerifier {
                 res := mload(mPtr)
             }
         }
+        console.log("logValue", logValue);
     }
 }

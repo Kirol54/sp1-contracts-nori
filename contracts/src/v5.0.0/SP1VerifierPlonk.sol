@@ -23,7 +23,8 @@ contract SP1Verifier is PlonkVerifier, ISP1VerifierWithHash {
 
     /// @inheritdoc ISP1VerifierWithHash
     function VERIFIER_HASH() public pure returns (bytes32) {
-        return 0xd4e8ecd2357dd882209800acd6abb443d231cf287d77ba62b732ce937c8b56e7;
+        return
+            0xd4e8ecd2357dd882209800acd6abb443d231cf287d77ba62b732ce937c8b56e7;
     }
 
     /// @notice Hashes the public values to a field elements inside Bn254.
